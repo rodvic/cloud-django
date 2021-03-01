@@ -1,0 +1,4 @@
+-r requirements.txt
+supervisor==4.1.0
+gunicorn==19.7.1
+gevent==1.4.0
