@@ -37,7 +37,6 @@ Telefónica I+D => Pragsis => ING => Telefónica Digital
 
 - Linkedin: https://www.linkedin.com/in/alejandrorodvic/
 - Github: rodvic
-- USAL: alejandro_rv@usal.es
 
 ## Cloud
 
