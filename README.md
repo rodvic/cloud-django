@@ -65,7 +65,7 @@ docker build --pull -t azure-django:latest .
 az login --use-device-code
 
 ## OR
-az login --service-principal -u b32c7a6b-1c51-4d0f-9f52-7b21cc57b71a -p "54_z_uEL5bRK6Aijb0YG_b4hf~RBQU.Urf" --tenant 7058ea36-d3d2-4deb-ae56-8d1217dcdba4
+az login --service-principal -u ceac1788-70f4-448c-82bf-8d4863b0f704 -p "" --tenant 7058ea36-d3d2-4deb-ae56-8d1217dcdba4
 
 # List subscriptions
 az account show
@@ -162,6 +162,18 @@ Docker Run
 
 > Add port 80 to Network Security Group
 
+## Create command with ssh-keys
+
+~~~
+# Create
+az vm create -n MyVm -g pro-upsa-acr \
+            --image ubuntults --size Standard_DS2_v2 \
+            --generate-ssh-keys
+
+# Connect
+ssh localuser@PUBLICIP
+~~~
+
 # Azure Deployment Services
 
 ## App Services
@@ -169,6 +181,23 @@ Docker Run
 ## Container Instances
 
 ## AKS
+
+~~~
+# Create
+az aks create --resource-group pro-upsa-acr --name myAKSCluster --node-count 1
+
+# List
+az aks list
+
+# Connect with kubectl
+az aks get-credentials --resource-group pro-upsa-acr --name myAKSCluster --admin
+
+# List all pods
+kubectl get pods -A
+
+# Run pod
+kubectl run -it --rm mypod --image=ubuntu -- bash
+~~~
 
 # Other Azure Services
 
