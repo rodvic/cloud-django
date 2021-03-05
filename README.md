@@ -158,7 +158,7 @@ Container Registry login
 
 Docker Run
 
-    docker run -d -p 80:80 proupsaacr.azurecr.io/azure-django:latest
+    docker run -d -p 80:7000 proupsaacr.azurecr.io/azure-django:latest
 
 > Add port 80 to Network Security Group
 
