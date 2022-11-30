@@ -23,7 +23,9 @@ Telefónica I+D => Pragsis => ING => Telefónica Digital
 ## Tecnologías
 
 - Git
+- GithubActions
 - Ansible
+- Terraform
 - Linux => RHEL/Centos | Debian/Ubuntu
 - Openstack
 - Hadoop Stack => Hortonworks/Cloudera

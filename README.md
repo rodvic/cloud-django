@@ -7,7 +7,7 @@
 ~~~
 python3 -m venv azure-venv
 source azure-venv/bin/activate
-pip install -r mysite/requirements.txt
+pip install -r django/requirements.txt
 ~~~
 
 # Django build
@@ -25,7 +25,7 @@ mv mysite/* django
 
 ## Run from local
 
-> From path: django
+> From path: ./django
 
 ~~~
 python manage.py runserver
@@ -35,13 +35,27 @@ python manage.py runserver
 
 ## Build django docker
 
-> From path: django
+> From path: ./django
 
 ~~~
 docker build --pull -t azure-django:latest .
 ~~~
 
+### Run from docker local
+
+~~~
+docker run --rm -p 8000:8000 azure-django:latest
+~~~
+
+> NOTE: http://127.0.0.1:8000/
+
 # Azure Active Directory
+
+> NOTE: you can use an azurecli client in docker for az commands:
+
+~~~
+docker run --rm -it mcr.microsoft.com/azure-cli bash
+~~~
 
 ## App registrations
 
@@ -105,7 +119,7 @@ az acr create -n proupsaacr -g pro-upsa-acr --sku basic
 az acr update -n proupsaacr --admin-enabled true
 
 # List
-az acr list
+az acr list -o tsv
 
 # List access keys
 az acr credential show --name proupsaacr
@@ -130,37 +144,38 @@ docker push proupsaacr.azurecr.io/azure-django:latest
 
 # Azure Virtual Machines
 
-Username: adminuser
+- Username: adminuser
 
-Image: Ubuntu Server 18.04 LTS
+- Image: Ubuntu Server 18.04 LTS
 
-SSH Access
+- SSH Access:
 
-    ssh adminuser@PUBLICIP
-    sudo -i
+~~~
+ssh adminuser@PUBLICIP
+sudo -i
+~~~
 
-Install AZ CLI
+- configure vm and docker run:
 
-    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+~~~
+# Install docker service
+apt-get update
+apt-get install -y docker.io curl
 
-Install docker service
+# Install AZ CLI
+curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
-    sudo apt-get update
-    sudo apt-get install -y docker.io
+# AZ login
+az login --use-device-code
 
-AZ login
+# Container Registry login
+az acr login --name proupsaacr
 
-    az login --use-device-code
+# Docker Run
+docker run -d -p 8000:8000 proupsaacr.azurecr.io/azure-django:latest
+~~~
 
-Container Registry login
-
-    az acr login --name proupsaacr
-
-Docker Run
-
-    docker run -d -p 80:7000 proupsaacr.azurecr.io/azure-django:latest
-
-> Add port 80 to Network Security Group
+> Add port 8000 to Network Security Group
 
 ## Create command with ssh-keys
 
@@ -171,7 +186,7 @@ az vm create -n MyVm -g pro-upsa-acr \
             --generate-ssh-keys
 
 # Connect
-ssh localuser@PUBLICIP
+ssh $(whoami)@PUBLICIP
 ~~~
 
 # Azure Deployment Services
@@ -182,21 +197,29 @@ ssh localuser@PUBLICIP
 
 ## AKS
 
+> From root repository path
+
 ~~~
 # Create
-az aks create --resource-group pro-upsa-acr --name myAKSCluster --node-count 1
+az aks create --resource-group pro-upsa-acr --name myAKSCluster --node-count 1 --generate-ssh-keys
 
 # List
-az aks list
+az aks list -o tsv
+
+# Install kubectl-cli
+az aks install-cli
 
 # Connect with kubectl
 az aks get-credentials --resource-group pro-upsa-acr --name myAKSCluster --admin
 
-# List all pods
-kubectl get pods -A
+# Create resources
+kubectl apply -f ./kubernetes/resources.yml
 
-# Run pod
-kubectl run -it --rm mypod --image=ubuntu -- bash
+# List all resources
+kubectl -n upsa get all
+
+# Run other pod and get bash
+kubectl -n upsa run -it --rm mypod --image=ubuntu:18.04 -- bash
 ~~~
 
 # Other Azure Services

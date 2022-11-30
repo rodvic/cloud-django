@@ -1,4 +1,5 @@
 -r requirements.txt
 supervisor==4.1.0
-gunicorn==19.7.1
-gevent==1.4.0
+gunicorn==19.9.0
+gevent==1.3.4
+greenlet==0.4.13
