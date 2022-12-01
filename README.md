@@ -180,7 +180,7 @@ docker run -d -p 8000:8000 proupsaacr.azurecr.io/azure-django:latest
 ## Create command with ssh-keys
 
 ~~~
-# Create
+# Create VM
 az vm create -n MyVm -g pro-upsa-acr \
             --image ubuntults --size Standard_DS2_v2 \
             --generate-ssh-keys
@@ -191,19 +191,24 @@ ssh $(whoami)@PUBLICIP
 
 # Azure Deployment Services
 
-## App Services
-
 ## Container Instances
+
+### Deploy from template
+
+> URL: https://portal.azure.com/#create/Microsoft.Template
+
+- file: ./templates/container_service.json
+  * Change <REGISTRY_NAME> and <REGISTRY_PASSWORD> for imageRegistryCredentials
 
 ## AKS
 
 > From root repository path
 
 ~~~
-# Create
+# Create AKS
 az aks create --resource-group pro-upsa-acr --name myAKSCluster --node-count 1 --generate-ssh-keys
 
-# List
+# AKS List
 az aks list -o tsv
 
 # Install kubectl-cli
@@ -212,10 +217,15 @@ az aks install-cli
 # Connect with kubectl
 az aks get-credentials --resource-group pro-upsa-acr --name myAKSCluster --admin
 
-# Create resources
+# Create kubernetes resources
+## Change <REGISTRY_NAME> and <REGISTRY_PASSWORD> for upsa-registry secret
+### Encode .dockerconfigjson to base64. Example:
+####  .dockerconfigjson: >-
+####    eyAiYXV0aHMiOg==
+
 kubectl apply -f ./kubernetes/resources.yml
 
-# List all resources
+# List all kubernetes resources
 kubectl -n upsa get all
 
 # Run other pod and get bash
