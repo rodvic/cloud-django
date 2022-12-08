@@ -8,6 +8,8 @@ Técnico Superior en Administración de Sistemas Informáticos (2011)
 
 Grado en Ingeniería Informática en Sistemas de Información (2015)
 
+Máster Universitario en Seguridad de las Tecnologías de la Información y las Comunicaciones (2021)
+
 ### Situación laboral
 
 Release Engineer => Control de versiones de desarrollo, empaquetado del software y despliegue automatizado (creación de la infraestrucura, instalación y configuración de software)
