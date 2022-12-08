@@ -1,4 +1,8 @@
-# Azure Deployment
+# Django build
+
+> Reference: https://www.djangoproject.com/start/
+
+## Initial requirements
 
 > From root repository path
 
@@ -9,8 +13,6 @@ python3 -m venv azure-venv
 source azure-venv/bin/activate
 pip install -r django/requirements.txt
 ~~~
-
-# Django build
 
 ## Create default site
 
@@ -35,6 +37,8 @@ python manage.py runserver
 
 ## Build django docker
 
+> Reference: https://docs.docker.com/get-started/
+
 > From path: ./django
 
 ~~~
@@ -49,7 +53,7 @@ docker run --rm -p 8000:8000 azure-django:latest
 
 > NOTE: http://127.0.0.1:8000/
 
-# Azure Active Directory
+# Azure services
 
 > NOTE: you can use an azurecli client in docker for az commands:
 
@@ -57,35 +61,45 @@ docker run --rm -p 8000:8000 azure-django:latest
 docker run --rm -it mcr.microsoft.com/azure-cli bash
 ~~~
 
+# Azure Active Directory
+
+> Reference: https://azure.microsoft.com/en-us/products/active-directory/
+
+- Secure your environment with multicloud identity and access management
+
 ## App registrations
 
 - New app
 - Certificates & secrets | New client secret
+  * Get AZURE_TENANT_ID - Directory (tenant) ID
+  * Get AZURE_CLIENT_ID - Application (client) ID
+  * Get AZURE_CLIENT_SECRET - Client secret
 
 # Subscriptions
 
+- Get AZURE_SUBSCRIPTION_ID - Subscription ID
+
 ## Access control (IAM)
 
-- Assign permissions on a subscription -> b4b3803e-5030-42a0-a734-4eda0e4e191e
+- Assign permissions (roles) to user/app on a subscription
 
 ## Resource providers
 
-## Commands
-
-> Reference: https://docs.microsoft.com/es-es/azure/container-registry/container-registry-get-started-docker-cli
+## azurecli login commands
 
 ~~~
-# AZ login
+# AZ login with user/password
 az login --use-device-code
 
 ## OR
-az login --service-principal -u ceac1788-70f4-448c-82bf-8d4863b0f704 -p "" --tenant 7058ea36-d3d2-4deb-ae56-8d1217dcdba4
+## AZ login with service-principal (AZURE_TENANT_ID / AZURE_CLIENT_ID / AZURE_CLIENT_SECRET)
+az login --service-principal -u <AZURE_CLIENT_ID> -p "<AZURE_CLIENT_SECRET>" --tenant <AZURE_TENANT_ID>
 
 # List subscriptions
 az account show
 
 # Change default subscription
-az account set -s SUBSCRIPTION_ID
+az account set -s <AZURE_SUBSCRIPTION_ID>
 ~~~
 
 # Resource group
@@ -105,6 +119,10 @@ az group list
 
 # Azure Container Registry
 
+> Reference: https://docs.microsoft.com/en-gb/azure/container-registry/container-registry-get-started-docker-cli
+
+- An Azure container registry stores and manages private container images and other artifacts, similar to the way Docker Hub stores public Docker container images.
+
 ## Create Container registries
 
 - resource group: pro-upsa-acr
@@ -112,23 +130,27 @@ az group list
 - sku: basic
 
 ~~~
-# Create
+# Create registry
 az acr create -n proupsaacr -g pro-upsa-acr --sku basic
 
 # Enable Administrator Account
 az acr update -n proupsaacr --admin-enabled true
 
-# List
+# List registries
 az acr list -o tsv
 
-# List access keys
+# List access keys (username/passwords) of registry
 az acr credential show --name proupsaacr
 
-# Container Registry login
+# Container Registry login (automatic docker login)
 az acr login --name proupsaacr
+
+## OR
+## docker login container registry
+docker login proupsaacr.azurecr.io
 ~~~
 
-# Docker build and push
+## Docker push to registry
 
 Docker tag:
 
@@ -177,7 +199,7 @@ docker run -d -p 8000:8000 proupsaacr.azurecr.io/azure-django:latest
 
 > Add port 8000 to Network Security Group
 
-## Create command with ssh-keys
+## VM create command with ssh-keys
 
 ~~~
 # Create VM
@@ -193,6 +215,10 @@ ssh $(whoami)@PUBLICIP
 
 ## Container Instances
 
+> Reference: https://azure.microsoft.com/en-gb/products/container-instances/#overview
+
+- Easily run containers on Azure without managing servers.
+
 ### Deploy from template
 
 > URL: https://portal.azure.com/#create/Microsoft.Template
@@ -200,7 +226,11 @@ ssh $(whoami)@PUBLICIP
 - file: ./templates/container_service.json
   * Change <REGISTRY_NAME> and <REGISTRY_PASSWORD> for imageRegistryCredentials
 
-## AKS
+## Azure Kubernetes Service (AKS)
+
+> Reference: https://azure.microsoft.com/en-gb/products/kubernetes-service/
+
+- Build and scale with managed Kubernetes
 
 > From root repository path
 
@@ -236,4 +266,28 @@ kubectl -n upsa run -it --rm mypod --image=ubuntu:18.04 -- bash
 
 ## Database Services
 
+> Reference: https://azure.microsoft.com/en-gb/products/category/databases/
+
+- Azure offers a choice of fully managed relational, NoSQL, and in-memory databases, spanning proprietary and open-source engines, to fit the needs of modern app developers.
+
+## Storage accounts
+
+> Reference: https://learn.microsoft.com/en-us/azure/storage/common/storage-account-overview
+
+- An Azure storage account contains all of your Azure Storage data objects, including blobs, file shares, queues, tables, and disks.
+
+## Azure HDInsight
+
+> Reference: https://azure.microsoft.com/en-gb/products/hdinsight/#features
+
+- Provision cloud Hadoop, Spark, R Server, HBase, and Storm clusters
+
 ## Databricks
+
+> Reference: https://azure.microsoft.com/en-gb/products/databricks/
+
+- Design AI with Apache Spark™-based analytics
+
+> Tutorial: Query data with notebooks: https://learn.microsoft.com/en-us/azure/databricks/getting-started/quick-start
+
+> Tutorial: ML engineering: https://learn.microsoft.com/en-us/azure/databricks/getting-started/ml-quick-start
