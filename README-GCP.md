@@ -53,7 +53,7 @@ IAM lets you grant granular access to specific Google Cloud resources and helps 
 
 > Reference: [Create a service account](https://cloud.google.com/iam/docs/service-accounts-create#creating)
 
-- IAM / Service accounts / + Create Service Account
+- IAM and admin / Service accounts / + Create Service Account
   * Service account ID: `saproupsa`
   * Service account name: `saproupsa`
   * Service account description: `saproupsa`
@@ -68,7 +68,7 @@ gcloud iam service-accounts create saproupsa \
 
 #### To grant your service account an IAM role (Editor) on your project
 
-- Manage resources / proupsa / Permissions / + Add Principal
+- Manage resources / `proupsa` / Permissions / + Add Principal
   * `saproupsa` (Service Account) -> `Editor` (Role)
 
 ```bash
@@ -80,8 +80,8 @@ gcloud projects add-iam-policy-binding proupsa \
 
 #### To allow users to attach the service account to other resources
 
-- IAM and admin
-  * member: `user:USER_EMAIL` -> your user email
+- IAM and admin / Service accounts / `saproupsa@proupsa.iam.gserviceaccount.com` / Permissions / + Grant Access
+  * `USER_EMAIL` (principals - your user email) -> `Service Account User` (Role)
 
 ```bash
 gcloud iam service-accounts add-iam-policy-binding \
@@ -157,12 +157,13 @@ A Virtual Private Cloud (VPC) network is a virtual version of a physical network
 
 > Reference: [Create an auto mode VPC network](https://cloud.google.com/vpc/docs/create-modify-vpc-networks#create-auto-network)
 
-- VPC networks / Create VPC Network:
-
-  * n 
+- VPC network / + Create VPC Network:
+  * VPC name: `proupsavpc`
+  * subnet-mode: custom
 
 ```bash
-gcloud compute networks create proupsavpc
+gcloud compute networks create proupsavpc \
+  --subnet-mode=custom
 ```
 
 - List VPCs:
@@ -171,130 +172,157 @@ gcloud compute networks create proupsavpc
 gcloud compute networks list
 ```
 
-# Azure Virtual Machines
+## Add an IPv4-only subnet
 
-- Username: adminuser
+> Reference: [Add an IPv4-only subnet](https://cloud.google.com/vpc/docs/create-modify-vpc-networks#add-subnets)
 
-- Image: Ubuntu Server 18.04 LTS
+When you create a subnet, you set a name, a region, and at least a primary IPv4 address range according to the name and IPv4 subnet range limitations.
 
-- SSH Access:
+- VPC network / `proupsavpc` / Subnets / + Add Subnet
+  * Subnet name: `proupsasubnet`
+  * network: `proupsavpc`
+  * range: `10.0.0.0/24`
+  * region: `europe-southwest1`
 
-~~~
-ssh adminuser@PUBLICIP
+```bash
+gcloud compute networks subnets create proupsasubnet \
+    --network=proupsavpc \
+    --range=10.0.0.0/24 \
+    --region=europe-southwest1
+```
+
+- List Subnets:
+
+```bash
+gcloud compute networks subnets list \
+   --network=proupsavpc
+```
+
+# VM Instances
+
+## Create a VM instance from a public image
+
+> Reference: [Create a VM instance from a public image](https://cloud.google.com/compute/docs/instances/create-start-instance#publicimage)
+
+- Compute Engine / VM instances / + Create instance
+  * Machine Configuration | VM name: `proupsavm01`
+  * Machine Configuration | region: `europe-southwest1`
+  * Machine Configuration | zone: `Any`
+  * Machine Configuration | Machine type: `e2-medium`
+  * OS abd storage | Image: `Ubuntu 20.04 LTS`
+  * Networking | Network: `proupsavpc`
+  * Networking | Subnetwork: `proupsasubnet`
+  * Networking | Network Service Tier: `Standard (europe-southwest1)`
+  * Security | Service account: `saproupsa@proupsa.iam.gserviceaccount.com`
+
+```bash
+gcloud compute instances create proupsavm01 \
+    --zone=europe-southwest1-a \
+    --machine-type=e2-medium \
+    --network-interface=network-tier=STANDARD,stack-type=IPV4_ONLY,subnet=proupsasubnet \
+    --service-account=saproupsa@proupsa.iam.gserviceaccount.com \
+    --create-disk=auto-delete=yes,boot=yes,image=projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20241219,mode=rw,size=10,type=pd-balanced
+```
+
+## Firewall - Add access rules
+
+- VPC network / `proupsavpc` / Firewalls / + Add Firewall Rule
+  * Rule name: `sshrule`
+  * Network: `proupsavpc`
+  * Priority: `1000`
+  * Direcion of traffic: `Ingress`
+  * Action on match: `Allow`
+  * Targets: `All instances in the network`
+  * Source filter | IPv4 ranges | `0.0.0.0/0`
+  * Specified Protocols and ports | TCP | `22`
+
+```bash
+gcloud compute firewall-rules create sshrule \
+  --direction=INGRESS \
+  --priority=1000 \
+  --network=proupsavpc \
+  --action=ALLOW \
+  --rules=tcp:22 \
+  --source-ranges=0.0.0.0/0
+```
+
+- VPC network / `proupsavpc` / Firewalls / + Add Firewall Rule
+  * Rule name: `httprule`
+  * Network: `proupsavpc`
+  * Priority: `1000`
+  * Direcion of traffic: `Ingress`
+  * Action on match: `Allow`
+  * Targets: `All instances in the network`
+  * Source filter | IPv4 ranges | `0.0.0.0/0`
+  * Specified Protocols and ports | TCP | `8000`
+
+```bash
+gcloud compute firewall-rules create httprule \
+  --direction=INGRESS \
+  --priority=1000 \
+  --network=proupsavpc \
+  --action=ALLOW \
+  --rules=tcp:8000 \
+  --source-ranges=0.0.0.0/0
+```
+
+## SSH access and VM configuration
+
+- SSH access (empty for no passphrase):
+
+```bash
+gcloud compute ssh "proupsavm01"
+```
+
+- Configure VM and docker run:
+
+```bash
+# root user
 sudo -i
-~~~
 
-- configure vm and docker run:
-
-~~~
 # Install docker service
 apt-get update
-apt-get install -y docker.io curl
+apt-get install -y docker.io
 
-# Install AZ CLI
-curl -sL https://aka.ms/InstallAzureCLIDeb | bash
-
-# AZ login
-az login --use-device-code
-
-# Container Registry login
-az acr login --name proupsaacr
+# gcloud auth configure-docker with service account
+gcloud auth configure-docker \
+  europe-southwest1-docker.pkg.dev \
+  --quiet
 
 # Docker Run
-docker run -d -p 8000:8000 proupsaacr.azurecr.io/azure-django:latest
-~~~
+docker run -d -p 8000:8000 europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/azure-django:latest
+```
 
-> Add port 8000 to Network Security Group
+## Test Service (from local)
 
-## VM create command with ssh-keys
+- List instances:
 
-~~~
-# Create VM
-az vm create -n MyVm -g pro-upsa-acr \
-            --image ubuntults --size Standard_DS2_v2 \
-            --generate-ssh-keys
+```bash
+gcloud compute instances list
 
-# Connect
-ssh $(whoami)@PUBLICIP
-~~~
+# Command output example:
+NAME         ZONE                 MACHINE_TYPE  PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP   STATUS
+proupsavm01  europe-southwest1-b  e2-medium                  10.0.0.3     34.0.215.213  RUNNING
+```
 
-# Azure Deployment Services
+- Use EXTERNAL_IP:
 
-## Container Instances
+```bash
+# use curl or browse IP/port
+curl http://<EXTERNAL_IP>:8000
+```
 
-> Reference: https://azure.microsoft.com/en-gb/products/container-instances/#overview
+# GCP Deployment Services
 
-- Easily run containers on Azure without managing servers.
+## Deploying container images to Cloud Run
 
-### Deploy from template
+> Reference: [Deploying container images to Cloud Run](https://cloud.google.com/run/docs/deploying)
 
-> URL: https://portal.azure.com/#create/Microsoft.Template
+Deploy container images to a new Cloud Run service or to a new revision of an existing Cloud Run service.
 
-- file: ./templates/container_service.json
-  * Change <REGISTRY_NAME> and <REGISTRY_PASSWORD> for imageRegistryCredentials
-
-## Azure Kubernetes Service (AKS)
-
-> Reference: https://azure.microsoft.com/en-gb/products/kubernetes-service/
-
-- Build and scale with managed Kubernetes
-
-> From root repository path
-
-~~~
-# Create AKS
-az aks create --resource-group pro-upsa-acr --name myAKSCluster --node-count 1 --generate-ssh-keys
-
-# AKS List
-az aks list -o tsv
-
-# Install kubectl-cli
-az aks install-cli
-
-# Connect with kubectl
-az aks get-credentials --resource-group pro-upsa-acr --name myAKSCluster --admin
-
-# Create kubernetes resources
-## Change <REGISTRY_NAME> and <REGISTRY_PASSWORD> for upsa-registry secret
-### Encode .dockerconfigjson to base64. Example:
-####  .dockerconfigjson: >-
-####    eyAiYXV0aHMiOg==
-
-kubectl apply -f ./kubernetes/resources.yml
-
-# List all kubernetes resources
-kubectl -n upsa get all
-
-# Run other pod and get bash
-kubectl -n upsa run -it --rm mypod --image=ubuntu:18.04 -- bash
-~~~
-
-# Other Azure Services
-
-## Database Services
-
-> Reference: https://azure.microsoft.com/en-gb/products/category/databases/
-
-- Azure offers a choice of fully managed relational, NoSQL, and in-memory databases, spanning proprietary and open-source engines, to fit the needs of modern app developers.
-
-## Storage accounts
-
-> Reference: https://learn.microsoft.com/en-us/azure/storage/common/storage-account-overview
-
-- An Azure storage account contains all of your Azure Storage data objects, including blobs, file shares, queues, tables, and disks.
-
-## Azure HDInsight
-
-> Reference: https://azure.microsoft.com/en-gb/products/hdinsight/#features
-
-- Provision cloud Hadoop, Spark, R Server, HBase, and Storm clusters
-
-## Databricks
-
-> Reference: https://azure.microsoft.com/en-gb/products/databricks/
-
-- Design AI with Apache Spark™-based analytics
-
-> Tutorial: Query data with notebooks: https://learn.microsoft.com/en-us/azure/databricks/getting-started/quick-start
-
-> Tutorial: ML engineering: https://learn.microsoft.com/en-us/azure/databricks/getting-started/ml-quick-start
+```bash
+gcloud run deploy azure-django \
+  --image=europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/azure-django@sha256:62376246d89f33202077bf0d793c4a67353be23d55c68e5a3af4a6b771e60008 \
+  --region=europe-southwest1 \
+&& gcloud run services update-traffic azure-django --to-latest
+```
