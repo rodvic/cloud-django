@@ -1,4 +1,4 @@
-> Build django docker image: [Django build](./README.md)
+> Build django docker image: [Django build](../README.md)
 
 # Google Cloud
 
@@ -22,6 +22,18 @@ docker run --rm -it gcr.io/google.com/cloudsdktool/google-cloud-cli:stable bash
 gcloud auth login
 ```
 
+- List accounts;
+
+```bash
+gcloud auth list
+```
+
+- Switch accounts if you are logged in to multiple accounts:
+
+```bash
+gcloud config set account ACCOUNT
+```
+
 # Creating and managing projects
 
 > Reference: [Creating and managing projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
@@ -31,6 +43,12 @@ gcloud auth login
 
 ```bash
 gcloud projects create proupsa
+```
+
+- List accounts projects:
+
+```bash
+gcloud projects list
 ```
 
 - Set current project:
