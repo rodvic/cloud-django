@@ -42,7 +42,7 @@ python manage.py runserver
 > From path: ./django
 
 ~~~
-docker build --pull -t azure-django:latest .
+docker build --load --pull -t azure-django:latest .
 ~~~
 
 ### Run from docker local

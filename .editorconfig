@@ -1,0 +1,40 @@
+# EditorConfig is awesome: http://EditorConfig.org
+# Add unset to undefine (and use editor default).
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+trim_trailing_white_space_on_save = true
+
+[*.yml]
+indent_style = space
+indent_size = 2
+
+[*.js]
+indent_style = space
+indent_size = 2
+
+[*.md]
+# Preserve trailing whitespace for Markdown files
+trim_trailing_whitespace = false
+
+[**\/resources\/*.json]
+insert_final_newline = false
+
+[*.tpl]
+insert_final_newline = false
+
+[*.py]
+max_line_length = 120
+indent_size = 4
+
+[*.html]
+max_line_length = 120
