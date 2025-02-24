@@ -20,7 +20,7 @@ Ingenieros de sistemas con capacidades específicas para integrarse en equipos D
 
 > Ref: https://www.paradigmadigital.com/techbiz/que-es-devops-y-sobre-todo-que-no-es-devops/
 
-Telefónica I+D => Pragsis => ING => Telefónica Digital
+Telefónica I+D => Pragsis => ING => Telefónica Innovación Digital
 
 ## Tecnologías
 
@@ -34,6 +34,7 @@ Telefónica I+D => Pragsis => ING => Telefónica Digital
 - Docker
 - AWS
 - Azure
+- GCP
 - Kubernetes
 - Databricks
 
@@ -44,6 +45,6 @@ Telefónica I+D => Pragsis => ING => Telefónica Digital
 
 ## Cloud
 
-AWS - Azure - Google Cloud
+AWS - Azure - GCP
 
 ![Cloud](images/cloud.png)
