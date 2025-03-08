@@ -1,4 +1,4 @@
-> Build django docker image: [Django build](../README.md)
+> Build django docker image: [Django build](../django/README.md)
 
 # Google Cloud
 

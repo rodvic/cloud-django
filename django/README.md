@@ -45,9 +45,3 @@ docker run --rm -p 8000:8000 cloud-django:latest
 ```
 
 > Access URL: [localhost:8000](http://127.0.0.1:8000/)
-
-# Deploy to cloud
-
-- [Deploy to AWS](./aws/README.md)
-- [Deploy to Azure](./azure/README.md)
-- [Deploy to GCP](./gcp/README.md)
