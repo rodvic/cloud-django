@@ -1,5 +1,6 @@
 # Common
 *venv*
+*.tmp
 
 # django
 db.sqlite3

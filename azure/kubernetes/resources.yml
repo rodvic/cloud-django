@@ -36,7 +36,7 @@ spec:
     - name: upsa-registry
   containers:
   - name: nginx
-    image: proupsaacr.azurecr.io/azure-django:latest
+    image: proupsaacr.azurecr.io/cloud-django:latest
     ports:
       - containerPort: 8000
         name: http-web-svc

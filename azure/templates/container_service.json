@@ -20,7 +20,7 @@
                     {
                         "name": "[parameters('containerGroups_upsadjango_name')]",
                         "properties": {
-                            "image": "proupsaacr.azurecr.io/azure-django:latest",
+                            "image": "proupsaacr.azurecr.io/cloud-django:latest",
                             "ports": [
                                 {
                                     "protocol": "TCP",

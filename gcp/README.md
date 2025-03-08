@@ -150,13 +150,13 @@ gcloud auth configure-docker \
 > Format: `LOCATION-docker.pkg.dev/PROJECT-ID/REPOSITORY/IMAGE`
 
 ```bash
-docker tag azure-django:latest europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/azure-django:latest
+docker tag cloud-django:latest europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/cloud-django:latest
 ```
 
 - Docker push:
 
 ```bash
-docker push europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/azure-django:latest
+docker push europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/cloud-django:latest
 ```
 
 - Artifacts list:
@@ -308,7 +308,7 @@ gcloud auth configure-docker \
   --quiet
 
 # Docker Run
-docker run -d -p 8000:8000 europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/azure-django:latest
+docker run -d -p 8000:8000 europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/cloud-django:latest
 ```
 
 ## Test Service (from local)
@@ -339,8 +339,8 @@ curl http://<EXTERNAL_IP>:8000
 Deploy container images to a new Cloud Run service or to a new revision of an existing Cloud Run service.
 
 ```bash
-gcloud run deploy azure-django \
-  --image=europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/azure-django@sha256:62376246d89f33202077bf0d793c4a67353be23d55c68e5a3af4a6b771e60008 \
+gcloud run deploy cloud-django \
+  --image=europe-southwest1-docker.pkg.dev/proupsa/proupsaacr/cloud-django@latest \
   --region=europe-southwest1 \
-&& gcloud run services update-traffic azure-django --to-latest
+&& gcloud run services update-traffic cloud-django --to-latest
 ```

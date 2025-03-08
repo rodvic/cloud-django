@@ -1,3 +1,5 @@
 *venv*
 db.sqllite3
 __pycache__
+Dockerfile
+README.md
