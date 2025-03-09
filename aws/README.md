@@ -6,6 +6,19 @@
 
 - Root user sign in: [AWS Management Console](https://aws.amazon.com/console/)
 
+## Create budget alerts
+
+> Reference: [Creating a budget](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/budgets-create.html)
+
+You can create budgets to track and take action on your costs and usage. You can also create budgets to track your aggregate Reserved Instance (RI) and Savings Plans utilization and coverage.
+
+- Billing and Cost Management / Budgets / Create budget
+  * Use a template (simplified)
+  * Zero spend budget - Create a budget that notifies you once your spending exceeds $0.01 which is above the AWS Free Tier limits.
+  * Budget name: `My Zero-Spend Budget`
+  * Email recipients: `<EMAIL>`
+  * Create budget
+
 ## Identity and Access Management (IAM)
 
 > Reference: [AWS Identity and Access Management (IAM)](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)
@@ -44,14 +57,6 @@ AWS Identity and Access Management (IAM) is a web service that helps you securel
 
 > Reference: [Installing the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 
-## AWS CLI Docker image
-
-> Reference: [AWS CLI Docker image](https://hub.docker.com/r/amazon/aws-cli)
-
-```bash
-docker run --rm -it amazon/aws-cli bash
-```
-
 ## AWS CLI login commands
 
 > Reference: [Run aws configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
@@ -61,6 +66,7 @@ docker run --rm -it amazon/aws-cli bash
 ```bash
 aws configure
 ```
+
 AWS Access Key ID: `AWS_ACCESS_KEY_ID`
 AWS Secret Access Key: `AWS_SECRET_ACCESS_KEY`
 Default region name: `eu-west-1` (Ireland)
@@ -74,13 +80,25 @@ export AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=eu-west-1
 ```
 
+## AWS CLI Docker image
+
+> Reference: [AWS CLI Docker image](https://hub.docker.com/r/amazon/aws-cli)
+
+```bash
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+  -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+  -e AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
+  amazon/aws-cli help
+```
+
 # Elastic Container Registry (ECR)
 
 > Reference: [Amazon Elastic Container Registry (ECR)](https://aws.amazon.com/ecr)
 
 Amazon Elastic Container Registry (ECR) is a fully managed container registry that makes it easy to store, manage, share and deploy your container images and artifacts anywhere.
 
-## Pricing
+## ECR Pricing
 
 > Reference: [Amazon Elastic Container Registry (ECR) Pricing](https://aws.amazon.com/ecr/pricing)
 
@@ -153,16 +171,44 @@ A VPC is a virtual network that closely resembles a traditional network that you
 aws ec2 create-vpc --cidr-block 10.0.0.0/16 --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=proupsa-vpc}]'
 ```
 
-- VPC ID: `vpc-<ID>`
-  * Example: `vpc-0cfb4860343c83f44`
-
-> Route table, dhcp options set, security group and network ACL are created by default. Only interal traffic is allowed by default.
-
 - List VPCs:
 
 ```bash
 aws ec2 describe-vpcs
 ```
+
+- VPC ID: `vpc-<ID>`
+  * Example: `vpc-0cfb4860343c83f44`
+
+### Default VPC resources
+
+> Route table, dhcp options set, security group and network ACL are created by default. Only interal traffic is allowed by default:
+
+#### Default VPC Route table
+
+> Reference: [Route tables](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html)
+
+A route table contains a set of rules, called routes, that determine where network traffic from your subnet or gateway is directed.
+
+```bash
+aws ec2 describe-route-tables --filters Name=vpc-id,Values=vpc-0cfb4860343c83f44
+```
+
+- Route table ID: `rtb-<ID>`
+  * Example: `rtb-0fde7ac5d2dfc9922`
+
+#### Default VPC Security group
+
+A security group controls the traffic that is allowed to reach and leave the resources that it is associated with. For example, after you associate a security group with an EC2 instance, it controls the inbound and outbound traffic for the instance.
+
+> Reference: [Security groups for your VPC](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html)
+
+```bash
+aws ec2 describe-security-groups --filters Name=vpc-id,Values=vpc-0cfb4860343c83f44
+```
+
+- Security group ID: `sg-<ID>`
+  * Example: `sg-02419826b750cd98a`
 
 ## Create a subnet
 
@@ -207,11 +253,164 @@ aws ec2 create-internet-gateway --tag-specifications 'ResourceType=internet-gate
 - Internet gateway ID: `igw-<ID>`
   * Example: `igw-0d7e090508c5232ae`
 
-- Attach internet gateway to VPC:
-  - VPC / Internet Gateways / `proupsa-igw` / Actions / Attach to VPC
-    * VPC: `proupsa-vpc`
-    * Attach internet gateway
+### Attach internet gateway to VPC
+
+- VPC / Internet Gateways / `proupsa-igw` / Actions / Attach to VPC
+  * VPC: `proupsa-vpc`
+  * Attach internet gateway
 
 ```bash
 aws ec2 attach-internet-gateway --vpc-id "vpc-0cfb4860343c83f44" --internet-gateway-id "igw-0d7e090508c5232ae" --region eu-west-1
+```
+
+### Add route to internet gateway
+
+- VPC / Route Tables / `rtb-0fde7ac5d2dfc9922` / Routes / Edit routes / Add route
+  * Destination: `0.0.0.0/0`
+  * Target: `Internet Gateway` / `proupsa-igw`
+  * Save changes
+
+```bash
+aws ec2 create-route --route-table-id "rtb-0fde7ac5d2dfc9922" --destination-cidr-block "0.0.0.0/0" --gateway-id "igw-0d7e090508c5232ae"
+```
+
+# Elastic Compute Cloud (EC2)
+
+> Reference: [Amazon EC2 documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html)
+
+Amazon Elastic Compute Cloud (Amazon EC2) provides on-demand, scalable computing capacity in the Amazon Web Services (AWS) Cloud. Using Amazon EC2 reduces hardware costs so you can develop and deploy applications faster. You can use Amazon EC2 to launch as many or as few virtual servers as you need, configure security and networking, and manage storage.
+
+## EC2 Pricing
+
+> Reference: [Amazon EC2 Pricing](https://aws.amazon.com/ec2/pricing)
+
+Free tier: In your first year of opening an AWS account, you get 750 hours per month of t2.micro instance usage (or t3.micro where t2.micro isn't available) when used with free tier AMIs, 750 hours per month of public IPv4 address usage, 30 GiB of EBS storage, 2 million I/Os, 1 GB of snapshots, and 100 GB of bandwidth to the internet.
+
+## Create a key pair
+
+> Reference: [Amazon EC2 key pairs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html)
+
+A key pair, consisting of a public key and a private key, is a set of security credentials that you use to prove your identity when connecting to an Amazon EC2 instance. For Linux instances, the private key allows you to securely SSH into your instance. For Windows instances, the private key is required to decrypt the administrator password, which you then use to connect to your instance.
+
+- EC2 / Key Pairs / Create key pair
+  * Key pair name: `proupsa-ec2-key-pair`
+  * File format: `pem`
+  * Create key pair
+
+```bash
+aws ec2 create-key-pair --key-name proupsa-ec2-key-pair --query 'KeyMaterial' --output text > proupsa-ec2-key-pair.pem
+```
+
+## Create an EC2 instance
+
+- EC2 / Instances / Launch instances
+  * Name and tags
+    * Name: `proupsa-ec2`
+  * Application and OS images (Amazon Machine Image)
+    * Amazon Machine Image (AMI): `Ubuntu Server 24.04 LTS (HVM), SSD Volume Type` (Free tier eligible)
+    * Architecture: `64-bit (x86)`
+    * Username: `ubuntu`
+  * Instance Type
+    * t2.micro (Free tier eligible)
+  * Key pair (login):
+    * Key pair name - required: `proupsa-ec2-key-pair`
+  * Network settings
+    * VPC - required: `proupsa-vpc`
+    * Subnet: `proupsa-subnet`
+    * Auto-assign Public IP: `Enable`
+    * Firewall (security group):
+      * Select existing security group: `sg-02419826b750cd98a` (default)
+  * Configure storage
+    * Root volume size: `8 GiB` (Free tier eligible customers can get up to 30 GB of EBS General Purpose (SSD) or Magnetic storage
+  * Summary
+    * Number of instances: `1`
+    * Launch instance
+
+```bash
+aws ec2 run-instances --image-id "ami-03fd334507439f4d1" --instance-type "t2.micro" --key-name "proupsa-ec2-key-pair" --block-device-mappings '{"DeviceName":"/dev/sda1","Ebs":{"Encrypted":false,"DeleteOnTermination":true,"Iops":3000,"SnapshotId":"snap-0f5e377686a0097e0","VolumeSize":8,"VolumeType":"gp3","Throughput":125}}' --network-interfaces '{"SubnetId":"subnet-048febcd087669823","AssociatePublicIpAddress":true,"DeviceIndex":0,"Groups":["sg-02419826b750cd98a"]}' --credit-specification '{"CpuCredits":"standard"}' --tag-specifications '{"ResourceType":"instance","Tags":[{"Key":"Name","Value":"proupsa-ec2"}]}' --metadata-options '{"HttpEndpoint":"enabled","HttpPutResponseHopLimit":2,"HttpTokens":"required"}' --private-dns-name-options '{"HostnameType":"ip-name","EnableResourceNameDnsARecord":false,"EnableResourceNameDnsAAAARecord":false}' --count "1" 
+```
+
+- List EC2 instances:
+
+```bash
+aws ec2 describe-instances
+```
+
+- Instance ID: `i-<ID>`
+  * Example: `i-09385e02cbc11ef61`
+- Public IPv4 address:
+  * Example: `3.253.30.135`
+- Username: `ubuntu`
+
+## Security group rules
+
+> Reference: [Security group rules](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html)
+
+Allow inbound traffic to the EC2 instance to SSH (port 22) and Django application (port 8000).
+
+- EC2 / Security Groups / `sg-02419826b750cd98a` / Inbound rules / Edit inbound rules
+  * Add rule
+    * Type: `SSH`
+    * Protocol: `TCP`
+    * Port range: `22`
+    * Source: `Anywhere`
+  * Add rule
+    * Type: `Custom TCP`
+    * Protocol: `TCP`
+    * Port range: `8000`
+    * Source: `Anywhere`
+
+```bash
+aws ec2 authorize-security-group-ingress --group-id sg-02419826b750cd98a --protocol tcp --port 22 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id sg-02419826b750cd98a --protocol tcp --port 8000 --cidr 0.0.0.0/0
+```
+
+## Connect to EC2 instance
+
+- SSH connection:
+
+> Format: `ssh -i <LOCAL_PATH>/proupsa-ec2-key-pair.pem ubuntu@<PUBLIC_IP>`
+
+```bash
+chmod 400 proupsa-ec2-key-pair.pem
+ssh -i proupsa-ec2-key-pair.pem ubuntu@3.253.30.135
+```
+
+- Configure VM and docker run:
+
+```bash
+# root user
+sudo -i
+
+# Install docker service
+apt-get update
+apt-get install -y docker.io unzip
+
+# Install awscli
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+./aws/install
+
+# AWS login with environment variables to ECR
+export AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID
+export AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY
+export AWS_DEFAULT_REGION=eu-west-1
+
+# Configure authentication to ECR for Docker
+aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 985539770271.dkr.ecr.eu-west-1.amazonaws.com
+
+# Docker Run
+docker run --pull always -d -p 8000:8000 985539770271.dkr.ecr.eu-west-1.amazonaws.com/cloud-django:latest
+```
+
+- Access the application:
+  * URL: `http://3.253.30.135:8000`
+
+## Terminate EC2 instance (Delete)
+
+- EC2 / Instances / `proupsa-ec2` / Actions / Instance State / Terminate instance
+  * Terminate
+
+```bash
+aws ec2 terminate-instances --instance-ids i-09385e02cbc11ef61
 ```

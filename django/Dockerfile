@@ -30,6 +30,9 @@ COPY ./conf /code/conf
 COPY ./mysite /code/mysite
 COPY supervisord.conf /code/supervisord.conf
 
+# ALLOWED_HOSTS
+RUN sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = \["*"\]/' /code/mysite/mysite/settings.py
+
 WORKDIR /code
 
 CMD ["supervisord", "-c", "/code/supervisord.conf"]
