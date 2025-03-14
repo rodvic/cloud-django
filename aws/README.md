@@ -232,19 +232,45 @@ aws ec2 describe-security-groups --filters Name=vpc-id,Values=vpc-0cfb4860343c83
 
 A subnet is a range of IP addresses in your VPC. You can create AWS resources, such as EC2 instances, in specific subnets.
 
+> Subnets are created in a specific Availability Zone. We generally create subnets in multiple Availability Zones for high availability. Regions have multiple Availability Zones, normally three or more.
+
 - VPC / Subnets / Create subnet
   - VPC: `proupsa-vpc`
-  - Subnet name: `proupsa-subnet`
-  - Availability Zone: `No preference`
+  - Subnet name: `proupsa-subnet-1`
+  - Availability Zone: `eu-west-1c`
   - IPv4 CIDR block: `10.0.0.0/24`
   - Create subnet
 
 ```bash
-aws ec2 create-subnet --vpc-id vpc-0cfb4860343c83f44 --cidr-block 10.0.0.0/24 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=proupsa-subnet}]'
+aws ec2 create-subnet --vpc-id vpc-0cfb4860343c83f44 --cidr-block 10.0.0.0/24 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=proupsa-subnet-1}]' --availability-zone eu-west-1c
+```
+
+- VPC / Subnets / Create subnet
+  - VPC: `proupsa-vpc`
+  - Subnet name: `proupsa-subnet-2`
+  - Availability Zone: `eu-west-1b`
+  - IPv4 CIDR block: `10.0.1.0/24`
+  - Create subnet
+
+```bash
+aws ec2 create-subnet --vpc-id vpc-0cfb4860343c83f44 --cidr-block 10.0.1.0/24 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=proupsa-subnet-2}]' --availability-zone eu-west-1b
+```
+
+- VPC / Subnets / Create subnet
+  - VPC: `proupsa-vpc`
+  - Subnet name: `proupsa-subnet-3`
+  - Availability Zone: `eu-west-1a`
+  - IPv4 CIDR block: `10.0.2.0/24`
+  - Create subnet
+
+```bash
+aws ec2 create-subnet --vpc-id vpc-0cfb4860343c83f44 --cidr-block 10.0.2.0/24 --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=proupsa-subnet-3}]' --availability-zone eu-west-1a
 ```
 
 - Subnet ID: `subnet-<ID>`
-  - Example: `subnet-048febcd087669823`
+  - Example: `subnet-048febcd087669823` (eu-west-1c)
+  - Example: `subnet-0906a1e5835327b69` (eu-west-1b)
+  - Example: `subnet-02be1dff315c314da` (eu-west-1a)
 
 - List VPC subnets:
 
@@ -380,6 +406,8 @@ Allow inbound traffic to the EC2 instance to SSH (port 22) and Django applicatio
 aws ec2 authorize-security-group-ingress --group-id sg-02419826b750cd98a --protocol tcp --port 22 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id sg-02419826b750cd98a --protocol tcp --port 8000 --cidr 0.0.0.0/0
 ```
+
+> WARNING: It is recommended to restrict the source IP address to your own IP address. 'Anywhere' is used for demonstration purposes. Get your IP address: [What is my IP address?](https://www.whatismyip.com)
 
 ## Connect to EC2 instance
 
@@ -533,4 +561,168 @@ aws s3 rm s3://proupsa-bucket --recursive
 aws s3api delete-bucket --bucket proupsa-bucket
 ```
 
-# CloudFront
+# Relational Database Service (RDS)
+
+> Reference: [Amazon RDS documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html)
+
+Amazon Relational Database Service (Amazon RDS) is a web service that makes it easier to set up, operate, and scale a relational database in the AWS Cloud. It provides cost-efficient, resizable capacity for an industry-standard relational database and manages common database administration tasks.
+
+## RDS Pricing
+
+> Reference: [Amazon RDS Pricing](https://aws.amazon.com/rds/pricing)
+
+As part of the AWS Free Tier, new AWS customers can get started with Amazon RDS for free.  Amazon RDS Free Tier includes the following each month for one year:
+
+- Amazon RDS usage per month: 750 hours on select Single-AZ Instance databases. Usage is aggregated across instance types if using more than one instance. (Available engines: MySQL, MariaDB, PostgreSQL, or SQL Server – SQL Server Express Edition only.)
+- General Purpose SSD (gp2) storage per month: 20 GB
+- Storage for automated database backups per month: 20 GB
+
+## Create a DB subnet group
+
+> Reference: [Creating a DB subnet group](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html)
+
+A DB subnet group is a collection of subnets (typically private) that you create in a VPC and that you then designate for your DB instances. By using a DB subnet group, you can specify a particular VPC when creating DB instances using the AWS CLI or RDS API. If you use the console, you can choose the VPC and subnet you want to use.
+
+- RDS / Subnet groups / Create DB subnet group
+  - Name: `proupsa-subnet-group`
+  - Description: `proupsa-subnet-group`
+  - VPC: `proupsa-vpc`
+  - Add all subnets
+  - Create
+
+```bash
+aws rds create-db-subnet-group --db-subnet-group-name proupsa-subnet-group --db-subnet-group-description proupsa-subnet-group --subnet-ids subnet-048febcd087669823 subnet-0906a1e5835327b69 subnet-02be1dff315c314da
+```
+
+## Create a database
+
+- RDS / Create database
+  - Choose a database creation method: `Standard Create`
+  - Engine options
+    - Engine type: `MySQL`
+    - Engine version: `MySQL 8.0.40`
+    - Enable RDS Extended Support: `No`
+  - Templates
+    - Use case: `Free tier`
+  - Availability and durability
+    - Single-AZ DB instance deployment (1 instance)
+  - Settings
+    - DB instance identifier: `proupsa-db`
+    - Master username: `admin`
+    - Master password: `<PASSWORD>`
+  - Instance configuration
+    - DB instance class: `db.t3.micro`
+  - Storage
+    - Storage type: `General Purpose (SSD)`
+    - Allocated storage: `20 GiB`
+    - Additional storage configuration
+      - Enable storage autoscaling: `Disabled`
+  - Connectivity
+    - Virtual private cloud (VPC): `proupsa-vpc`
+    - Publicly accessible: `No`
+    - VPC security group (firewall): `sg-02419826b750cd98a`
+    - Additional configuration
+      - Database port: `3306`
+  - Database authentication
+    - Password authentication
+  - Create database
+
+```bash
+aws rds create-db-instance --db-instance-identifier proupsa-db --db-instance-class db.t3.micro --engine mysql --engine-version 8.0.40 --allocated-storage 20 --master-username admin --master-user-password <PASSWORD> --vpc-security-group-ids sg-02419826b750cd98a --no-publicly-accessible --no-auto-minor-version-upgrade --no-enable-iam-database-authentication --region eu-west-1 --no-multi-az --db-subnet-group-name proupsa-subnet-group --engine-lifecycle-support open-source-rds-extended-support-disabled
+```
+
+> Database creation takes a few minutes. You can check the status in the RDS console.
+
+- List RDS instances:
+
+```bash
+aws rds describe-db-instances
+```
+
+- DB connection details:
+  - Endpoint: `proupsa-db.<ID>.eu-west-1.rds.amazonaws.com`
+    - Example: `proupsa-db.chs6k6oy68uo.eu-west-1.rds.amazonaws.com`
+  - Port: `3306`
+  - Username: `admin`
+  - Password: `<PASSWORD>`
+
+## Connect to RDS database from EC2 instance
+
+- SSH to EC2 instance:
+
+```bash
+ssh -i proupsa-ec2-key-pair.pem ubuntu@<PUBLIC_IP>
+```
+
+- Configure MySQL client:
+
+```bash
+# root user
+sudo -i
+
+# Install mysql client
+apt-get update
+apt-get install -y mysql-client
+
+# Connect to RDS database
+mysql -h proupsa-db.chs6k6oy68uo.eu-west-1.rds.amazonaws.com -P 3306 -u admin -p
+```
+
+- Enter the password when prompted.
+
+- MySQL prompt:
+
+```bash
+mysql>
+```
+
+- List databases:
+
+```sql
+SHOW DATABASES;
+```
+
+- Create a new database:
+
+```sql
+CREATE DATABASE proupsa;
+```
+
+- Use the new database:
+
+```sql
+USE proupsa;
+```
+
+- Create a new table:
+
+```sql
+CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(255));
+```
+
+- Insert data into the table:
+
+```sql
+INSERT INTO users (id, name) VALUES (1, 'John Doe');
+```
+
+- Query the table:
+
+```sql
+SELECT * FROM users;
+```
+
+- Exit MySQL:
+
+```sql
+exit
+```
+
+## Delete RDS database
+
+- RDS / Databases / `proupsa-db` / Actions / Delete
+  - Delete
+
+```bash
+aws rds delete-db-instance --db-instance-identifier proupsa-db --skip-final-snapshot
+```
