@@ -4,7 +4,9 @@
 
 > Reference: [AWS Free Tier](https://aws.amazon.com/free)
 
-Whether you're looking for generative AI, compute power, database storage, content delivery, or other functionality, AWS has the services to help you build sophisticated applications with increased flexibility, scalability, and reliability
+Whether you're looking for generative AI, compute power, database storage, content delivery, or other functionality, AWS has the services to help you build sophisticated applications with increased flexibility, scalability, and reliability.
+
+- AWS Free Tier FAQs: [AWS Free Tier FAQs](https://aws.amazon.com/free/faqs)
 
 - Root user sign in: [AWS Management Console](https://aws.amazon.com/console/)
 
@@ -20,6 +22,12 @@ You can create budgets to track and take action on your costs and usage. You can
   - Budget name: `My Zero-Spend Budget`
   - Email recipients: `<EMAIL>`
   - Create budget
+
+## Grant access to the billing console
+
+> Reference: [Grant access to the billing console](https://docs.aws.amazon.com/IAM/latest/UserGuide/getting-started-account-iam.html#billing-access)
+
+IAM users and roles in an AWS account can't access the Billing and Cost Management console by default. This is true even if they have IAM policies that grant access to certain Billing features. To grant access, the AWS account root user must first activate IAM access.
 
 ## Identity and Access Management (IAM)
 
@@ -39,6 +47,7 @@ AWS Identity and Access Management (IAM) is a web service that helps you securel
   - Set permissions:
     - Attach existing policies directly
       - AdministratorAccess
+      - AWSCostAndUsageReportAutomationPolicy
   - Review and create user
   - Retrieve password:
     - Console sign-in URL: `https://<ACCOUNT_ID>.signin.aws.amazon.com/console`
@@ -62,6 +71,12 @@ AWS Identity and Access Management (IAM) is a web service that helps you securel
 AWS has the concept of a region, which is a physical location around the world where we cluster data centers. We call each group of logical data centers an Availability Zone. Each AWS Region consists of multiple, isolated, and physically separate Availability Zones within a geographic area.
 
 We use `eu-west-1` (Ireland) to configure aws client as `AWS_DEFAULT_REGION`. You can use --region option in the AWS CLI commands to specify another region.
+
+In the AWS Management Console, the region selector is in the upper-right corner of the console.
+
+```bash
+export AWS_DEFAULT_REGION=eu-west-1
+```
 
 ## Installing the AWS CLI
 
@@ -582,6 +597,8 @@ As part of the AWS Free Tier, new AWS customers can get started with Amazon RDS 
 > Reference: [Creating a DB subnet group](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html)
 
 A DB subnet group is a collection of subnets (typically private) that you create in a VPC and that you then designate for your DB instances. By using a DB subnet group, you can specify a particular VPC when creating DB instances using the AWS CLI or RDS API. If you use the console, you can choose the VPC and subnet you want to use.
+
+> WARNING: The DB subnet group must be created with subnets in different Availability Zones for high availability.
 
 - RDS / Subnet groups / Create DB subnet group
   - Name: `proupsa-subnet-group`
