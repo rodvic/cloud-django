@@ -191,7 +191,7 @@ A VPC is a virtual network that closely resembles a traditional network that you
 
 ## Create a VPC
 
-> An default VPC is created when you create an AWS account. You can create additional VPCs.
+> An default VPC is created when you create an AWS account. You can create additional VPCs:
 
 - VPC / Your VPCs / Create VPC
   - Name tag - optional: `proupsa-vpc`
@@ -213,7 +213,26 @@ aws ec2 describe-vpcs
 - VPC ID: `vpc-<ID>`
   - Example: `vpc-0cfb4860343c83f44`
 
-> Route table, dhcp options set, security group and network ACL are created by default. Only interal traffic is allowed by default:
+> Route table, dhcp options set, security group and network ACL are created by default. Only interal traffic is allowed by default.
+
+### Configure VPC DNS settings
+
+> Reference: [DNS support in your VPC](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html)
+
+Domain Name System (DNS) is a standard by which names used on the internet are resolved to their corresponding IP addresses. A DNS hostname is a name that uniquely and absolutely names a computer; it's composed of a host name and a domain name. DNS servers resolve DNS hostnames to their corresponding IP addresses.
+
+> WARNING: DNS hostnames and DNS resolution is required to configure a public RDS database.
+
+- VPC / Your VPCs / `proupsa-vpc` / Actions / Edit VPC settings
+  - DNS settings
+    - Enable DNS resolution: `Yes`
+    - Enable DNS hostnames: `Yes`
+    - Save settings
+
+```bash
+aws ec2 modify-vpc-attribute --vpc-id vpc-0cfb4860343c83f44 --enable-dns-support
+aws ec2 modify-vpc-attribute --vpc-id vpc-0cfb4860343c83f44 --enable-dns-hostnames
+```
 
 ### Default VPC Route table
 
@@ -241,7 +260,7 @@ aws ec2 describe-security-groups --filters Name=vpc-id,Values=vpc-0cfb4860343c83
 - Security group ID: `sg-<ID>`
   - Example: `sg-02419826b750cd98a`
 
-## Create a subnet
+## Create subnets
 
 > Reference: [Subnets for your VPC](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html)
 
@@ -550,6 +569,52 @@ aws s3 cp s3://proupsa-bucket/README.md /tmp/README.md
 
 ```json
 download: s3://proupsa-bucket/README.md to /tmp/README.md
+```
+
+## Working with Mountpoint for Amazon S3 from EC2 instance
+
+> Reference: [Working with Mountpoint for Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mountpoint.html)
+
+Mountpoint for Amazon S3 is a high-throughput open source file client for mounting an Amazon S3 bucket as a local file system. With Mountpoint, your applications can access objects stored in Amazon S3 through file system operations, such as open and read. Mountpoint automatically translates these operations into S3 object API calls, giving your applications access to the elastic storage and throughput of Amazon S3 through a file interface.
+
+- SSH to EC2 instance:
+
+```bash
+ssh -i proupsa-ec2-key-pair.pem ubuntu@<PUBLIC_IP>
+```
+
+- Install and configure Mountpoint:
+
+```bash
+# root user
+sudo -i
+
+# Download Mountpoint
+wget https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.deb
+
+# Install Mountpoint
+apt-get update
+apt-get install ./mount-s3.deb -y
+
+# check version
+mount-s3 --version
+
+# Create a mount point
+mkdir /mnt/s3
+
+# AWS login with environment variables to ECR
+export AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID
+export AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY
+export AWS_DEFAULT_REGION=eu-west-1
+
+# Mount the S3 bucket
+mount-s3 proupsa-bucket /mnt/s3
+
+# List files
+ls /mnt/s3
+
+# Unmount the S3 bucket
+umount /mnt/s3
 ```
 
 ## Delete files from S3 bucket
