@@ -2,6 +2,7 @@
 *venv*
 *.tmp
 *.pem
+*.DS_Store
 
 # django
 db.sqlite3
