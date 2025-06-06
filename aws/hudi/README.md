@@ -10,6 +10,8 @@ AWS Glue is a serverless service that makes data integration simpler, faster, an
 
 > Reference: [AWS Glue Pricing](https://aws.amazon.com/glue/pricing/)
 
+Free tier:
+
 - 1 Million objects stored in the AWS Glue Data Catalog.
 - 1 Million requests made per month to the AWS Glue Data Catalog.
 
@@ -54,6 +56,7 @@ This container image has been tested for AWS Glue 5.0 Spark jobs. The image cont
 To run the container, you need to have Docker installed and configured on your machine. You also need to have your AWS credentials set up in the `./.aws` directory or pass them as environment variables.
 
 > WARNING: AWS region must be set to `eu-west-1` for this container to work properly, mount the `.aws` directory to path `/home/hadoop/.aws` in the container.
+> From aws/hudi repository path
 
 ```bash
 docker run -it --rm \
@@ -202,7 +205,7 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.col
 
 // Read CSV file from S3
-val inputPath = "s3://proupsa-bucket/people.csv"`
+val inputPath = "s3://proupsa-bucket/people.csv"
 val df = spark.read.option("header", "true").csv(inputPath)
   .withColumn("ts", col("ts").cast("long"))
   .withColumn("fecha", col("fecha").cast("string"))
