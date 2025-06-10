@@ -69,9 +69,9 @@ resource "aws_internet_gateway" "igw" {
 
 # Create a route to the internet through the internet gateway
 resource "aws_route" "route_internet" {
-  route_table_id            = aws_vpc.vpc_01.default_route_table_id
-  destination_cidr_block    = "0.0.0.0/0"
-  gateway_id                = aws_internet_gateway.igw.id
+  route_table_id         = aws_vpc.vpc_01.default_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
 }
 
 # Create an output with VPC ID
@@ -83,7 +83,7 @@ output "vpc_id" {
 # Create an output to subnet ID
 output "subnet_ids" {
   description = "The IDs of the subnets"
-  value       = [
+  value = [
     aws_subnet.subnet_01.id,
     aws_subnet.subnet_2.id,
     aws_subnet.subnet_3.id

@@ -2,8 +2,6 @@
 
 This example demonstrates how to create networking resources such as VPC, subnets, internet gateway, and route tables using Terraform.
 
-> Reference: [Terraform AWS VPC](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc)
-
 ## Prerequisites
 
 - Run docker container with Terraform builded from aws/terraform directory: [docker build and run instructions](../README.md)
@@ -46,6 +44,14 @@ To apply the changes defined in your Terraform configuration, run the following 
 
 ```bash
 terraform apply tfplan
+```
+
+## Terraform Refresh
+
+To refresh the Terraform state with the latest information from your AWS environment, you can run the following command. This updates the state file with the current state of resources.
+
+```bash
+terraform refresh
 ```
 
 ## Terraform Output
