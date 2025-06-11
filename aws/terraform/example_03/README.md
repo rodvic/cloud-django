@@ -7,7 +7,15 @@ This example demonstrates how to create networking resources such as VPC, subnet
 - Run docker container with Terraform builded from aws/terraform directory: [docker build and run instructions](../README.md)
 
 ```bash
-cd example_02
+cd example_03
+```
+
+## Generate Bucket for Terraform State
+
+To manage the Terraform state file, you need to create an S3 bucket. This bucket will store the state file and allow for remote state management.
+
+```bash
+aws s3api create-bucket --bucket proupsa-terraform-example-03 --region eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
 ```
 
 ## Terraform Initialization
@@ -17,12 +25,6 @@ Before running the Terraform commands, ensure you have initialized the Terraform
 ```bash
 terraform init
 ```
-
-## Use pre-configured ssh key
-
-If you want to use a pre-configured SSH key for your EC2 instance, you can specify the key name in the `variables.tf` file or directly in the `main.tf` file. Make sure the key pair exists in your AWS account.
-
-[Generating SSH key](../../README.md#Create-a-key-pair)
 
 ## Terraform Plan
 
@@ -42,4 +44,20 @@ To apply the changes defined in your Terraform configuration, run the following 
 
 ```bash
 terraform apply tfplan
+```
+
+## SSH conection to EC2 Instance
+
+To connect to the EC2 instance created by Terraform, you need to use SSH. A key pair is generated during the Terraform apply process, and you can use it to connect to the instance.
+
+```bash
+ssh -i ec2_key.pem ubuntu@<EC2_INSTANCE_PUBLIC_IP>
+```
+
+## Terraform Destroy
+
+To clean up and remove all the resources created by Terraform, you can run the destroy command. This will delete all the resources defined in your Terraform configuration.
+
+```bash
+terraform destroy
 ```

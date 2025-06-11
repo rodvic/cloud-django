@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     jq \
+    ssh \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Install AWS CLI v2

@@ -22,13 +22,17 @@ docker build --load -t terraform-awscli .
 
 Once the Docker image is built, you can run a container from it. This container will have both Terraform and the AWS CLI installed, allowing you to manage AWS resources using Terraform.
 
+> Mount full repository to /workspace in container `$(pwd)/../..` and set working directory to `/workspace/aws/terraform`.
+>
+> Use your AWS credentials as environment variables to authenticate with AWS.
+
 ```bash
 docker run -it --rm \
   -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
   -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
   -e AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
-  -v $(pwd):/workspace \
-  -w /workspace \
+  -v $(pwd)/../..:/workspace \
+  -w /workspace/aws/terraform \
   terraform-awscli \
   /bin/bash
 ```
@@ -37,4 +41,6 @@ docker run -it --rm \
 
 This directory contains various examples of using Terraform with AWS. Each example is in its own subdirectory, and you can run the Terraform commands within each subdirectory to manage the respective AWS resources.
 
-- [example_01](./example_01/README.md): This example demonstrates how to create an S3 bucket using Terraform.
+- [example_01](./example_01/README.md): Create an S3 Bucket
+- [example_02](./example_02/README.md): Create Networking Resources with main.tf
+- [example_03](./example_03/README.md): Create Networking Resources and EC2 Instance with modules
