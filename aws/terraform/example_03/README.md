@@ -10,14 +10,6 @@ This example demonstrates how to create networking resources such as VPC, subnet
 cd example_03
 ```
 
-## Generate Bucket for Terraform State
-
-To manage the Terraform state file, you need to create an S3 bucket. This bucket will store the state file and allow for remote state management.
-
-```bash
-aws s3api create-bucket --bucket proupsa-terraform-example-03 --region eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
-```
-
 ## Terraform Initialization
 
 Before running the Terraform commands, ensure you have initialized the Terraform configuration. This step downloads the necessary provider plugins.
