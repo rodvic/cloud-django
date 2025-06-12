@@ -64,13 +64,3 @@ module "allow_ssh" {
   cidr_blocks       = ["0.0.0.0/0"]
   description       = "Allow SSH from anywhere"
 }
-
-module "allow_8000" {
-  source            = "./modules/security_group_rule"
-  security_group_id = module.vpc.default_security_group_id
-  from_port         = 8000
-  to_port           = 8000
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  description       = "Allow SSH from anywhere"
-}
