@@ -103,7 +103,7 @@ terraform state list
 To view detailed information about a specific resource, you can use:
 
 ```bash
-terraform state show aws_s3_bucket.example_01
+terraform state show aws_s3_bucket.bucket_01
 ```
 
 ## Terraform Destroy
