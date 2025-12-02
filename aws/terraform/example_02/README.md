@@ -4,7 +4,7 @@ This example demonstrates how to create networking resources such as VPC, subnet
 
 ## Infrastructure Diagram
 
-📊 [Open Infrastructure Diagram](infrastructure.drawio) (requires Draw.io extension)
+![Infrastructure Diagram](infrastructure.svg)
 
 The diagram shows the complete AWS infrastructure including:
 

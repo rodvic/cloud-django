@@ -1,27 +1,47 @@
-# Example 03 - Create Networking Resources and EC2 Instance with modules
+# Example 04 - Network Segmentation: Public EC2 and Private RDS
 
-This example demonstrates how to create networking resources such as VPC, subnets, internet gateway, and route tables using Terraform, along with an EC2 instance using modules.
+This example demonstrates how to create a segmented network architecture with:
 
-## Infrastructure Diagram
+- **Public subnet**: EC2 instance with public IP and Internet Gateway access
+- **Private subnets**: RDS MySQL database in isolated subnets (multi-AZ ready)
+- **Security groups**: Separated security groups for EC2 (public access) and RDS (private access only from EC2)
 
-![Infrastructure Diagram](infrastructure.svg)
+## Architecture
 
-The diagram shows the complete AWS infrastructure including:
+### Network Design
 
-- VPC (10.3.0.0/16) with DNS hostnames enabled
-- Three subnets across different availability zones (eu-west-1a, eu-west-1b, eu-west-1c)
-- Internet Gateway for external connectivity
-- Default Route Table with internet route (0.0.0.0/0 → IGW)
-- Security Group with SSH access (port 22)
-- EC2 instance (t2.micro) in subnet_01 with public IP enabled
-- RSA key pair for SSH authentication
+- **VPC**: 10.4.0.0/16
+- **Public Subnets**:
+  - 10.4.1.0/24 (eu-west-1a)
+  - 10.4.2.0/24 (eu-west-1b)
+  - 10.4.3.0/24 (eu-west-1c)
+  - For EC2 instances (multi-AZ ready)
+- **Private Subnets**:
+  - 10.4.10.0/24 (eu-west-1a)
+  - 10.4.11.0/24 (eu-west-1b)
+  - 10.4.12.0/24 (eu-west-1c)
+  - For RDS (multi-AZ subnet group)
+
+### Security
+
+- **EC2 Security Group**: Allows SSH (22), HTTP (8000) from Internet, all outbound traffic
+- **RDS Security Group**: Allows MySQL (3306) only from EC2 security group
+- **RDS**: Not publicly accessible, only reachable from EC2 instances
+
+### Components
+
+1. **VPC** with DNS hostnames enabled
+2. **Internet Gateway** attached to VPC
+3. **Public Route Table** with route to Internet Gateway
+4. **EC2 Instance** in public subnet with public IP
+5. **RDS MySQL** in private subnets without public access
 
 ## Prerequisites
 
 - Run docker container with Terraform builded from aws/terraform directory: [docker build and run instructions](../README.md)
 
 ```bash
-cd example_03
+cd example_04
 ```
 
 ## Terraform Initialization
@@ -39,6 +59,7 @@ To see what changes Terraform will make to your AWS environment, run the followi
 > You can use the `-out` option to save the plan to a file for later execution:
 
 ```bash
+export TF_VAR_rds_password="tu_password_segura"
 terraform plan -out=tfplan
 ```
 
