@@ -24,13 +24,6 @@
   <text x="90" y="135" class="label">VPC: example_03_vpc</text>
   <text x="90" y="155" class="small">CIDR: 10.3.0.0/16 | DNS Hostnames: Enabled</text>
 
-  <!-- Default Security Group (VPC Level) -->
-  <rect x="100" y="185" width="180" height="90" fill="#FF9900" stroke="#232F3E" stroke-width="2" rx="4"/>
-  <text x="190" y="210" text-anchor="middle" class="white-label">Default Security Group</text>
-  <text x="190" y="230" text-anchor="middle" class="white-small">(VPC Level)</text>
-  <text x="190" y="250" text-anchor="middle" class="white-small">Rule: Allow SSH</text>
-  <text x="190" y="267" text-anchor="middle" class="white-small">Port: 22 | Source: 0.0.0.0/0</text>
-
   <!-- Internet -->
   <ellipse cx="700" cy="15" rx="80" ry="15" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
   <text x="700" y="20" text-anchor="middle" class="small" font-weight="bold">Internet</text>
@@ -99,18 +92,6 @@
   <line x1="740" y1="360" x2="740" y2="380" stroke="#00A4A6" stroke-width="1.5" stroke-dasharray="4,2"/>
   <line x1="740" y1="380" x2="1125" y2="380" stroke="#00A4A6" stroke-width="1.5" stroke-dasharray="4,2"/>
   <line x1="1125" y1="380" x2="1125" y2="460" stroke="#00A4A6" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrowteal)"/>
-
-  <!-- Arrow from Security Group to EC2 (dashed) -->
-  <line x1="280" y1="230" x2="275" y2="540" stroke="#FF9900" stroke-width="2" stroke-dasharray="4,2"/>
-
-  <!-- Key Pair Icon (outside VPC) -->
-  <rect x="950" y="60" width="120" height="80" fill="#DD4814" stroke="#232F3E" stroke-width="2" rx="4"/>
-  <text x="1010" y="85" text-anchor="middle" class="white-label">Key Pair</text>
-  <text x="1010" y="105" text-anchor="middle" class="white-small">RSA 2048</text>
-  <text x="1010" y="125" text-anchor="middle" class="white-small">ec2_key.pem</text>
-
-  <!-- Arrow from Key Pair to EC2 (dashed) -->
-  <line x1="950" y1="110" x2="400" y2="540" stroke="#DD4814" stroke-width="1.5" stroke-dasharray="4,2"/>
 
   <!-- Legend -->
   <text x="1070" y="240" class="label" font-weight="bold">Legend:</text>

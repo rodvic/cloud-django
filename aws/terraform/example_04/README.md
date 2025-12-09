@@ -6,6 +6,21 @@ This example demonstrates how to create a segmented network architecture with:
 - **Private subnets**: RDS MySQL database in isolated subnets (multi-AZ ready)
 - **Security groups**: Separated security groups for EC2 (public access) and RDS (private access only from EC2)
 
+## Infrastructure Diagram
+
+![Infrastructure Diagram](infrastructure.svg)
+
+The diagram shows the complete network segmentation architecture including:
+
+- VPC (10.4.0.0/16) with DNS hostnames enabled
+- Internet Gateway with public route table
+- 3 Public Subnets (10.4.1-3.0/24) with Internet access for EC2 instances
+- 3 Private Subnets (10.4.10-12.0/24) isolated from Internet for RDS database
+- EC2 instance (t2.micro) with public IP in public subnet running Docker + Nginx
+- RDS MySQL database (db.t3.micro) in private subnets, multi-AZ ready, not publicly accessible
+- MySQL connection from EC2 to RDS (port 3306)
+- S3 bucket with versioning enabled
+
 ## Architecture
 
 ### Network Design
@@ -15,7 +30,7 @@ This example demonstrates how to create a segmented network architecture with:
   - 10.4.1.0/24 (eu-west-1a)
   - 10.4.2.0/24 (eu-west-1b)
   - 10.4.3.0/24 (eu-west-1c)
-  - For EC2 instances (multi-AZ ready)
+  - For EC2 instances
 - **Private Subnets**:
   - 10.4.10.0/24 (eu-west-1a)
   - 10.4.11.0/24 (eu-west-1b)
