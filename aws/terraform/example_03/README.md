@@ -2,6 +2,20 @@
 
 This example demonstrates how to create networking resources such as VPC, subnets, internet gateway, and route tables using Terraform, along with an EC2 instance using modules.
 
+## Infrastructure Diagram
+
+![Infrastructure Diagram](infrastructure.svg)
+
+The diagram shows the complete AWS infrastructure including:
+
+- VPC (10.3.0.0/16) with DNS hostnames enabled
+- Three subnets across different availability zones (eu-west-1a, eu-west-1b, eu-west-1c)
+- Internet Gateway for external connectivity
+- Default Route Table with internet route (0.0.0.0/0 → IGW)
+- Security Group with SSH access (port 22)
+- EC2 instance (t2.micro) in subnet_01 with public IP enabled
+- RSA key pair for SSH authentication
+
 ## Prerequisites
 
 - Run docker container with Terraform builded from aws/terraform directory: [docker build and run instructions](../README.md)

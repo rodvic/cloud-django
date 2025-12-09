@@ -26,5 +26,12 @@ RUN curl -fsSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/ter
     mv terraform /usr/local/bin/ && \
     rm terraform.zip
 
+# Install Packer
+ENV PACKER_VERSION=1.11.2
+RUN curl -fsSL https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip -o packer.zip && \
+    unzip -o packer.zip && \
+    mv packer /usr/local/bin/ && \
+    rm packer.zip
+
 # Set default command
 CMD ["bash"]
