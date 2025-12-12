@@ -26,8 +26,11 @@ cd example_02
 
 To manage the Terraform state file, you need to create an S3 bucket. This bucket will store the state file and allow for remote state management.
 
+> S3 bucket names must be globally unique. Therefore, we set the bucket name using an environment variable with a timestamp to ensure uniqueness.
+
 ```bash
-aws s3api create-bucket --bucket proupsa-terraform-example-02 --region eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
+export S3_BUCKET_NAME="proupsa-example-02-$(date +%Y%m%d%H%M%S)"
+aws s3api create-bucket --bucket ${S3_BUCKET_NAME} --region eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
 ```
 
 ## Terraform Initialization
@@ -35,7 +38,7 @@ aws s3api create-bucket --bucket proupsa-terraform-example-02 --region eu-west-1
 Before running the Terraform commands, ensure you have initialized the Terraform configuration. This step downloads the necessary provider plugins.
 
 ```bash
-terraform init
+terraform init -backend-config="bucket=${S3_BUCKET_NAME}"
 ```
 
 ## Terraform Plan
@@ -110,4 +113,16 @@ To remove all the resources created by this Terraform configuration, you can run
 
 ```bash
 terraform destroy
+```
+
+## Delete S3 bucket
+
+After destroying the Terraform-managed resources, you may want to delete the S3 bucket used for storing the Terraform state. Before deleting the bucket, ensure it is empty.
+
+```bash
+# Empty bucket recursively
+aws s3 rm s3://${S3_BUCKET_NAME} --recursive
+
+# Delete bucket
+aws s3api delete-bucket --bucket ${S3_BUCKET_NAME}
 ```

@@ -74,7 +74,10 @@ terraform fmt
 
 To see what changes Terraform will make to your AWS environment, run the following command. This generates an execution plan without making any changes.
 
+> S3 bucket names must be globally unique. Therefore, we set the bucket name using an environment variable with a timestamp to ensure uniqueness.
+
 ```bash
+export TF_VAR_s3_bucket_name="proupsa-example-01-$(date +%Y%m%d%H%M%S)"
 terraform plan
 ```
 

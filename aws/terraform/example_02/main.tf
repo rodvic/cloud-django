@@ -6,10 +6,9 @@ terraform {
     }
   }
   backend "s3" {
-    bucket         = "proupsa-terraform-example-02"
-    key            = "terraform.tfstate"
-    region         = "eu-west-1"
-    encrypt        = true
+    key     = "terraform.tfstate"
+    region  = "eu-west-1"
+    encrypt = true
   }
 }
 
@@ -41,7 +40,7 @@ resource "aws_subnet" "subnet_01" {
   }
 }
 
-resource "aws_subnet" "subnet_2" {
+resource "aws_subnet" "subnet_02" {
   vpc_id            = aws_vpc.vpc_01.id
   cidr_block        = "10.2.2.0/24"
   availability_zone = "eu-west-1b"
@@ -52,7 +51,7 @@ resource "aws_subnet" "subnet_2" {
   }
 }
 
-resource "aws_subnet" "subnet_3" {
+resource "aws_subnet" "subnet_03" {
   vpc_id            = aws_vpc.vpc_01.id
   cidr_block        = "10.2.3.0/24"
   availability_zone = "eu-west-1c"
@@ -91,8 +90,8 @@ output "subnet_ids" {
   description = "The IDs of the subnets"
   value = [
     aws_subnet.subnet_01.id,
-    aws_subnet.subnet_2.id,
-    aws_subnet.subnet_3.id
+    aws_subnet.subnet_02.id,
+    aws_subnet.subnet_03.id
   ]
 }
 
