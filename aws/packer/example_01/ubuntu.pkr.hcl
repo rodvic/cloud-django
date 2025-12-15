@@ -8,7 +8,7 @@ packer {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "example-01-linux-aws"
+  ami_name      = "example-01-ubuntu"
   instance_type = "t2.micro"
   region        = "eu-west-1"
   source_ami_filter {
@@ -21,11 +21,12 @@ source "amazon-ebs" "ubuntu" {
     owners      = ["099720109477"]
   }
   ssh_username = "ubuntu"
+  tags = {
+    Environment = "example_01"
+    Name        = "example_01_ubuntu"
+  }
 }
 
 build {
-  name = "example-01"
-  sources = [
-    "source.amazon-ebs.ubuntu"
-  ]
+  sources = ["source.amazon-ebs.ubuntu"]
 }

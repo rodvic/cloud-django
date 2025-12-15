@@ -182,9 +182,21 @@ aws ec2 describe-images --owners self
 }
 ```
 
+- Get the AMI ID created by Packer:
+
+```bash
+EXAMPLE_01_AMI_ID=$(aws ec2 describe-images --owners self --filters "Name=name,Values=example-01-ubuntu" --query 'Images | sort_by(@, &CreationDate)[-1].ImageId' --output text)
+```
+
 - List from AWS Management Console: [Amazon Machine Images (AMIs) - owned-by-me](https://eu-west-1.console.aws.amazon.com/ec2/home?region=eu-west-1#Images:visibility=owned-by-me)
 
-### Cleanup
+## Launch an EC2 Instance from the AMI
+
+You can launch an EC2 instance from the created AMI using the AWS Management Console or AWS CLI.
+
+- Launch from AWS Management Console: [Launch Instance Wizard](https://eu-west-1.console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchInstanceWizard:)
+
+## Cleanup AMI and Snapshot
 
 You can remove the AMI by first deregistering it on the AWS AMI management page. Next, delete the associated snapshot on the AWS snapshot management page. It is important to delete the snapshot after deregistering the AMI to avoid incurring storage costs.
 
@@ -195,10 +207,8 @@ You can remove the AMI by first deregistering it on the AWS AMI management page.
 - Alternatively, you can use the AWS CLI to deregister the AMI and delete the snapshot in one command by using the `--delete-associated-snapshots` flag:
 
 ```bash
-aws ec2 deregister-image --delete-associated-snapshots --image-id ami-002738ad6a4079cf8
+aws ec2 deregister-image --delete-associated-snapshots --image-id ${EXAMPLE_01_AMI_ID}
 ```
-
-> Note: Replace `ami-002738ad6a4079cf8` with your actual AMI ID.
 
 - Example output:
 
