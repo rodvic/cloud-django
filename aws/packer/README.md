@@ -38,3 +38,7 @@ docker run -it --rm \
 ## Examples
 
 This directory contains various examples of using Packer with AWS. Each example is in its own subdirectory, and you can run the Packer commands within each subdirectory to manage the respective AWS resources.
+
+- [example_01](./example_01/README.md): build an AWS Ubuntu AMI
+- [example_02](./example_02/README.md): Ubuntu with Docker Image on AWS
+- [example_03](./example_03/README.md): Ubuntu with django Docker Image on AWS
