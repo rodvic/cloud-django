@@ -1,21 +1,19 @@
 # Terraform examples for AWS
 
-This directory contains an example of using Terraform to manage AWS resources. It includes a Dockerfile to build an image with Terraform and the AWS CLI installed, allowing you to run Terraform commands in a containerized environment.
+This directory contains examples of using Terraform to manage AWS resources. It includes a Dockerfile to build an image with Terraform and the AWS CLI installed, allowing you to run Terraform commands in a containerized environment.
 
 > Reference: [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 
 Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS. You must configure the provider with the proper credentials before you can use it.
 
-## Building a Docker Image with Terraform and AWS CLI
+## Building a Docker Image with Terraform, Packer and AWS CLI
 
-This example demonstrates how to build a Docker image that includes Terraform and the AWS CLI, which can be used for managing AWS resources.
-
-- Docker image with Terraform and AWS CLI installed
+This example demonstrates how to build a Docker image that includes Terraform, Packer and the AWS CLI, which can be used for managing AWS resources.
 
 > From aws/terraform repository path
 
 ```bash
-docker build --load -t terraform-awscli .
+docker build --load -t terraform-packer-awscli . -f Dockerfile
 ```
 
 ## Running the Docker Container
@@ -33,7 +31,7 @@ docker run -it --rm \
   -e AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
   -v $(pwd)/../..:/workspace \
   -w /workspace/aws/terraform \
-  terraform-awscli \
+  terraform-packer-awscli \
   /bin/bash
 ```
 
@@ -44,3 +42,4 @@ This directory contains various examples of using Terraform with AWS. Each examp
 - [example_01](./example_01/README.md): Create an S3 Bucket
 - [example_02](./example_02/README.md): Create Networking Resources with main.tf
 - [example_03](./example_03/README.md): Create Networking Resources and EC2 Instance with modules
+- [example_04](./example_04/README.md): Network Segmentation: Public EC2 and Private RDS
