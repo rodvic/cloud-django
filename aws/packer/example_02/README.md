@@ -1,6 +1,6 @@
-# Example 01 - Ubuntu Docker Image on AWS
+# Example 02 - Ubuntu with Docker Image on AWS
 
-This example demonstrates how to create a custom Ubuntu-based Docker image on AWS using Packer.
+This example demonstrates how to create a custom Ubuntu-based with a nginx Docker image on AWS using Packer.
 
 > Reference: [Provision](https://developer.hashicorp.com/packer/tutorials/aws-get-started/aws-get-started-provision)
 
@@ -64,6 +64,8 @@ Build the image with the packer build command. Packer will print output similar 
 packer build .
 ```
 
+## Retrieving the AMI ID
+
 - Get the AMI ID created by Packer:
 
 ```bash
@@ -80,16 +82,8 @@ After successfully creating the AMI with Packer, you can use the AMI ID in your 
 module "ec2" {
   source                        = "./modules/ec2_instance"
   ami                           = "ami-03fd334507439f4d1" # Replace with your Packer-built AMI ID
-  instance_type                 = "t2.micro"
-  key_name                      = aws_key_pair.ec2-key-pair.key_name
-  subnet_id                     = module.subnets.subnet_ids[0] # Using the first subnet for the instance
-  associate_public_ip_address   = true
-  security_group_ids            = [module.vpc.default_security_group_id]
-  tags = {
-    Environment = "example_03"
-    Name        = "example_03_ec2_instance"
-  }
-  instance_count                = 1
+
+  # ...
 }
 ```
 

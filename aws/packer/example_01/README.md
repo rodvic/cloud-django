@@ -182,6 +182,8 @@ aws ec2 describe-images --owners self
 }
 ```
 
+## Retrieving the AMI ID
+
 - Get the AMI ID created by Packer:
 
 ```bash
