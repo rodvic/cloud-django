@@ -179,7 +179,7 @@ module "ec2" {
   user_data = <<-EOF
     #!/bin/bash
     # use build docker image from packer - cloud-django:APP_VERSION
-    docker run -d -p 8000:8000 cloud-django:1.0.0
+    docker run -d --restart always -p 8000:8000 cloud-django:1.0.0
   EOF
 }
 ```
